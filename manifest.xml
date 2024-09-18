@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<info>
+    <!-- Must match id in JS SpPS.register call in kebab-case -->
+    <name>Template</name>
+    <title>Template Plugin</title>
+    <description>Base template for creating Plugins for Spacialist.</description>
+    <version>1.0.0</version>
+    <licence>MIT</licence>
+    <authors>
+        <author>Severin Opel</author>
+    </authors>
+    <dependencies>
+        <!-- Other plugins this plugin depends on -->
+    </dependencies>
+    <permissions>
+        <!-- Other requirements this plugin depends on -->
+        <!-- <client /> -->
+        <!-- <migration /> -->
+        <!-- <routes /> -->
+        <!-- <public /> -->
+    </permissions>
+</info>
