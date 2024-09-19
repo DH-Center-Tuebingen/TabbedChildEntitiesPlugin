@@ -129,14 +129,9 @@ async function main() {
             success('Version in manifest.xml matches version in package.json');
         }
 
-
-
-
         logs.forEach((log) => {
             console.log(log.message);
         });
-
-
     }
 }
 

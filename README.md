@@ -1,4 +1,4 @@
-# Spacialist Plugin Template
+# Tabbed Child Entities
 
 This template is meant as a starting point for Plugin Development. It is setup to work out of the box with spacialist and has a lot of developer tooling already setup, so that you don't have to setup anything on your own and you can start developing right away.
 
