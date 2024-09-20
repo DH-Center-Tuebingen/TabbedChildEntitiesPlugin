@@ -61,6 +61,7 @@ SpPS.intoSlot({
 
 const entityDetail = reactive({
     tabs: [],
+    childEntities: []
 });
 
 // :style="{
@@ -80,14 +81,17 @@ SpPS.subscribe({
     topic: 'entityDetail',
     update: async (entity) => {
         entityDetail.tabs = [];
-        console.log('entityDetail', entity);
         let children = entity.children;
         if (!entity.childrenLoaded) {
             console.log(SpPS.api.store);
             children = await SpPS.api.store.dispatch('fetchEntityChildren', entity.id);
         }
 
-        entityDetail.tabs = children.map(val => val.name);
+        // Filter same entity children to avoid recursion
+        children = children.filter(child => entity.id !== child.id);
+        
+        entityDetail.tabs = children.map(child => child.name);
+        entityDetail.childEntities = children;
     },
     components: reactive({
         tabs: computed(() => {
@@ -105,13 +109,18 @@ SpPS.subscribe({
             });
         }),
         panels: computed(() => {
-            console.log(entityDetail);
-            return entityDetail.tabs.map(val => {
+            return entityDetail.childEntities.map(entity => {
                 return {
-                    component: { template: `<div>${val}</div>` },
-                    view: `entity-${val}`
+                    component: SpPS.get.component('EntityDetail'),
+                    vBind: { 
+                        entity: entity,
+                        readOnly: true,
+                        allowPluginSlot:false,
+                        applyViewToQueryString: false,
+                    },
+                    view: `entity-${entity.name}`,
                 };
             });
-        })
+        }) 
     })
 });
