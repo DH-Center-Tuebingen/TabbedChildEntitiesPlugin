@@ -2,60 +2,69 @@
 
 namespace App\Plugins\TabbedChildEntities\App;
 
-use App\Plugin\Hook;
-use App\Plugin\HookRegister;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Entity;
 
-class Hooks
-{    
-    protected $table = 'tabbed_child_entities'; // Specify the table name if it's different from the model name
+class Hooks {
 
-    protected $fillable = [
-        'entity_type_id'
-    ];
-    
-    public function __construct() {
-        
-        $name = 'tabbed_child_entities';
-        
-        HookRegister::get()->register($name , Hook::ENTITY_TYPE_UPDATE, function(Request $request, JsonResponse $response) use ($name):JsonResponse {
+    // const NAME = 'tabbed_child_entities';
 
-            $entityId = $request->route('id');
-            $useTabbedChildren = $request->input("plugin_data.$name.tabbed", false);  
-            
-            info("HOOK UPDATE: ". $useTabbedChildren);
-            TabbedChildEntities::updateData($entityId, $useTabbedChildren);
+    // public function entityUpdate(Request $request, JsonResponse $response) {
+    //     $entityId = $request->route('id');
+    //     $useTabbedChildren = $request->input("plugin_data." . static::NAME . ".tabbed", false);
+    //     TabbedChildEntities::updateData($entityId, $useTabbedChildren);
+    //     return $response;
+    // }
+
+    // public function global(Request $request, JsonResponse $response) {
+    //     $data = $response->getData(true);
+    //     $ids = array_values(array_map(fn($value): int => $value['id'], $data['entityTypes']));
+    //     $tabbedEntityTypes = TabbedChildEntities::activeIds($ids);
+
+    //     foreach ($data['entityTypes'] as $key => $entityType) {
+    //         if (!isset($entityType['plugin_data'])) {
+    //             $entityType['plugin_data'] = [];
+    //         }
+
+    //         if (!isset($entityType['plugin_data'][static::NAME])) {
+    //             $entityType['plugin_data'][static::NAME] = [];
+    //         }
+
+    //         $entityType['plugin_data'][static::NAME]['tabbed'] = in_array($entityType['id'], $tabbedEntityTypes);
+    //         $data['entityTypes'][$key] = $entityType;
+    //     }
+
+    //     $response->setData($data);
+    //     return $response;
+    // }
+
+
+    public function addChildrenToEntity(Request $request, JsonResponse $response) {
+        $data = $response->getData(true);
+        $entityId = $request->route('id');
+
+        $entityTypeId = Entity::find($entityId)->entity_type_id;
+
+        if (!$entityTypeId || !in_array($entityTypeId, TabbedChildEntities::activeIds([$entityTypeId]))) {
             return $response;
+        }
+
+        $data['tabbed_child_entities'] = [];
+        \App\Entity::where('root_entity_id', $entityId)->orderBy('rank')->get()->each(function ($child) use (&$data) {
+            $entityData = [];
+            $entityData['id'] = $child->id;
+            $entityData['name'] = $child->name;
+            $entityData['type'] = $child->entity_type_id;
+            $entityData['rank'] = $child->rank;
+
+            $entityData['data'] = $child->getData();
+            $data['tabbed_child_entities'][] = $entityData;
         });
-        
-        HookRegister::get()->register($name , Hook::GLOBAL, function(Request $request, JsonResponse $response) use($name) :JsonResponse  {
-            $data = $response->getData(true);    
-            $ids = array_values(array_map(fn($value):int => $value['id'], $data['entityTypes']));
-            $tabbedEntityTypes = TabbedChildEntities::activeIds($ids);
-            
-            foreach($data['entityTypes'] as $key => $entityType){
-                if(!isset($entityType['plugin_data'])){
-                    $entityType['plugin_data'] = [];
-                }
-                
-                if(!isset($entityType['plugin_data'][$name])){
-                    $entityType['plugin_data'][$name] = [];
-                }
-                
-                $entityType['plugin_data'][$name]['tabbed'] = in_array($entityType['id'], $tabbedEntityTypes);
-                $data['entityTypes'][$key] = $entityType;
-            }
-            
-            $response->setData($data);
-            return $response;
-        });
+
+        $response->setData($data);
+
+        return $response;
     }
-    
-
-    
-
-    
-    
 }
 

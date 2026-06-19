@@ -2,52 +2,38 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { XMLParser } from 'fast-xml-parser';
 import { readFileSync } from 'fs';
+import useViteDevServer from 'spacialist-plugin-playground/useViteServer';
 
 
+let pluginName;
 
-function loadData() {
-    const xmlParser = new XMLParser();
+const xmlParser = new XMLParser();
+const manifestText = readFileSync('plugin.xml', 'utf8');
+const manifest = xmlParser.parse(manifestText);
+pluginName = manifest?.info?.name;
 
-    const manifestText = readManifest();
-    if (!manifestText) throw new Error('manifest.xml not found');
-
-    const manifest = xmlParser.parse(manifestText);
-    let pluginName = manifest?.info?.name;
-
-    if (!pluginName) {
-        throw new Error('manifest.xml does not contain a name');
-    }
-
-    return { manifest, pluginName };
+if(!pluginName) {
+    throw new Error('manifest.xml does not contain a name');
 }
-
-
-function readManifest() {
-    let manifest;
-    const locations = ['manifest.xml', 'App/info.xml'];
-
-    for (const location of locations) {
-        try {
-            manifest = readFileSync(location, 'utf8');
-            break;
-        } catch (e) {
-            continue;
-        }
-    }
-
-    return manifest;
-}
-
-const { pluginName } = loadData();
-
+// Check if Vite is running in development mode
+const isDev = process.env.NODE_ENV === 'development';
 export default defineConfig({
     plugins: [vue()],
+    server: useViteDevServer(),
+    define: {
+        // Sometimes dependencies require the NODE_ENV which is not provided by Vite
+        // this will set the process env for all imports (currently required for vee-validate)
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
+        'process.env': {}
+    },
     build: {
-        minify: false,
+        sourcemap: true,
         lib: {
-            entry: 'src/main.js',
+            // We run the 'playground' when using the vite dev server
+            // otherwise we build directly using the main.js
+            entry: isDev ? 'src/js/_dev/app.js' : 'src/main.js',
             name: pluginName,
-            fileName: (format) => `script.${format}.js`
+            fileName: (format) => `${pluginName.toLowerCase()}.${format}.js`
         },
         rollupOptions: {
             external: ['vue'],
@@ -57,5 +43,5 @@ export default defineConfig({
                 }
             }
         }
-    }
+    },
 });

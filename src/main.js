@@ -2,6 +2,8 @@ import { computed, reactive, ref, watch } from 'vue';
 // import App from './App.vue'
 // import Files from './components/Files.vue';
 import DataModelOptionsToggle from './components/DataModelOptionsToggle.vue';
+import TabbedChildTab from './components/TabbedChildTab.vue';
+import TabbedChildEntity from './components/TabbedChildEntity.vue';
 
 // // Store (Vuex)
 // import store from './bootstrap/store.js';
@@ -59,68 +61,32 @@ SpPS.intoSlot({
 });
 
 
-const entityDetail = reactive({
-    tabs: [],
-    childEntities: []
-});
+const data = ref([]);
 
-// :style="{
-//     color: getEntityColors(child.entity_type_id).backgroundColor,
-//     textShadow: '0 0 1px rgba(0, 0, 0, 0.3)',
-// }"
-// href="#"
-// @click.prevent="setEntityView(child)"
-// >
-// <i class="fas fa-fw fa-cube" />
-// <span>{{ child.name }}</span>
-// <span> {{ getEntityTypeName(child.entity_type_id) ?? child.entity_type_id }}</span>
-// </a>
-
-SpPS.subscribe({
+SpPS.registerDynalot({
     of: pluginName,
-    topic: 'entityDetail',
-    update: async (entity) => {
-        entityDetail.tabs = [];
-        let children = entity.children;
-        if (!entity.childrenLoaded) {
-            console.log(SpPS.api.store);
-            children = await SpPS.api.store.dispatch('fetchEntityChildren', entity.id);
+    slot: 'entity-detail-tabs',
+    update: async ({ entity, response = null }) => {
+        const nextData = [];
+        if (response && response.tabbed_child_entities) {
+            for (const { id, name, type } of response.tabbed_child_entities) {
+                nextData.push({
+                    id,
+                    name,
+                    type,
+                });
+            }
         }
-
-        // Filter same entity children to avoid recursion
-        children = children.filter(child => entity.id !== child.id);
-        
-        entityDetail.tabs = children.map(child => child.name);
-        entityDetail.childEntities = children;
+        data.value = nextData
     },
-    components: reactive({
-        tabs: computed(() => {
-            console.log(entityDetail);
-            return entityDetail.tabs.map(val => {
-                return {
-                    component: {
-                        template: `<div>
-                        <i class="fas fa-fw fa-cube" />
-                        <span>${val}</span>
-                        </div>`
-                    },
-                    view: `entity-${val}`
-                };
-            });
-        }),
-        panels: computed(() => {
-            return entityDetail.childEntities.map(entity => {
-                return {
-                    component: SpPS.get.component('EntityDetail'),
-                    vBind: { 
-                        entity: entity,
-                        readOnly: true,
-                        allowPluginSlot:false,
-                        applyViewToQueryString: false,
-                    },
-                    view: `entity-${entity.name}`,
-                };
-            });
-        }) 
-    })
+    getData() {
+        return data.value;
+    },
+    getComponent(name) {
+        switch (name) {
+            case 'tab': return TabbedChildTab;
+            case 'panel': return TabbedChildEntity;
+            default: throw new Error(`Unknown component ${name}`);
+        }
+    }
 });

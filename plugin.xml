@@ -11,12 +11,10 @@
     </authors>
     <dependencies>
         <!-- Other plugins this plugin depends on -->
+        <File />
     </dependencies>
-    <permissions>
-        <!-- Other requirements this plugin depends on -->
-        <!-- <client /> -->
-        <!-- <migration /> -->
-        <!-- <routes /> -->
-        <!-- <public /> -->
-    </permissions>
+    <migrations src="Migrations" />
+    <hooks>
+        <hook src="App\Hooks@addChildrenToEntity" on="api/v1/entity/{id}/entity_detail" />
+    </hooks>
 </info>

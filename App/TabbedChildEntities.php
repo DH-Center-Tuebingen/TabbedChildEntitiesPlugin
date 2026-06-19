@@ -13,19 +13,29 @@ class TabbedChildEntities extends Model
         'entity_type_id'
     ];   
 
-    public static function updateData(int $entityId, bool $useTabbedChildren){
-        if($useTabbedChildren) {
-            TabbedChildEntities::firstOrCreate([
-                'entity_type_id' => $entityId
-            ]);
-        }else{            
-            TabbedChildEntities::where('entity_type_id', $entityId)->delete();
-        }
-    }
+    // public static function updateData(int $entityId, bool $useTabbedChildren){
+    //     if($useTabbedChildren) {
+    //         TabbedChildEntities::firstOrCreate([
+    //             'entity_type_id' => $entityId
+    //         ]);
+    //     }else{            
+    //         TabbedChildEntities::where('entity_type_id', $entityId)->delete();
+    //     }
+    // }
 
     public static function activeIds(array $ids) : array {
         return TabbedChildEntities::whereIn('entity_type_id', $ids)->pluck('entity_type_id')->all();
     }
-    
+
+
+    public static function add(int $entityTypeId) {
+        static::firstOrCreate([
+            'entity_type_id' => $entityTypeId
+        ]);
+    }
+
+    public static function remove(int $entityTypeId) {
+        static::where('entity_type_id', $entityTypeId)->delete();
+    }
 }
 

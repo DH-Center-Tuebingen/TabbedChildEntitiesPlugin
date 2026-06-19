@@ -1,5 +1,7 @@
 {
-    "name": "spacialist_plugin_template",
+    "name": "spacialist_plugin_tabbed_child_entities",
+    "pluginName": "TabbedChildEntities",
+    "description": "A Spacialist plugin for managing tabbed child entities.",
     "private": true,
     "type": "module",
     "scripts": {
@@ -9,12 +11,14 @@
         "doctor": "node doctor.js --call"
     },
     "dependencies": {
+        "pg-promise": "^12.1.3",
+        "spacialist-plugin-playground": "github:Severino/spacialist-plugin-playground",
         "vue": "^3.3.11"
     },
     "devDependencies": {
-        "@vitejs/plugin-vue": "^4.5.2",
+        "@vitejs/plugin-vue": "^6.0.7",
         "fast-xml-parser": "^4.4.0",
-        "vite": "^5.0.8"
+        "vite": "^8.0.16"
     },
     "version": "1.0.0"
 }
