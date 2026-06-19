@@ -31,14 +31,15 @@ package: clean
 	[ -d App ] && rsync -zah App $(build_src)/$(package_root)/ || true
 	[ -d Attributes ] && rsync -zah Attributes $(build_src)/$(package_root)/ || true
 	[ -d Controllers ] && rsync -zah Controllers $(build_src)/$(package_root)/ || true
-	[ -d Migration ] && rsync -zah Migration $(build_src)/$(package_root)/ || true
+	[ -d Migrations ] && rsync -zah Migrations $(build_src)/$(package_root)/ || true
 	[ -d routes ] && rsync -zah routes $(build_src)/$(package_root)/ || true
+	[ -f plugin.xml ] && rsync -zah plugin.xml $(build_src)/$(package_root)/ || true
 	# Copy files if they exist
-	[ -f $(dst_dir)/$(package_name).umd.js ] && cp $(dst_dir)/$(package_name).umd.js $(build_src)/$(package_root)/ || true
+	[ -f $(dst_dir)/tabbedchildentities.umd.js ] && cp $(dst_dir)/tabbedchildentities.umd.js $(build_src)/$(package_root)/ || true
 	[ -f $(root_dir)/CHANGELOG.md ] && cp $(root_dir)/CHANGELOG.md $(build_src)/$(package_root)/ || true
 	mkdir -p $(build_src)/$(package_root)/js
-	[ -f $(build_src)/$(package_root)/$(package_name).umd.js ] && mv $(build_src)/$(package_root)/$(package_name).umd.js $(build_src)/$(package_root)/js/script.js || true
-	tar -czf $(build_dir)/$(package_name).tar.gz \
-	   --directory="$(build_src)" $(package_root)
-	(cd $(build_src) && zip ../$(package_name).zip -r .)
-	rm -rf $(build_src)
+	[ -f $(build_src)/$(package_root)/tabbedchildentities.umd.js ] && mv $(build_src)/$(package_root)/tabbedchildentities.umd.js $(build_src)/$(package_root)/js/script.js || true
+ 	tar -czf $(build_dir)/$(package_name).tar.gz \
+ 	   --directory="$(build_src)" $(package_root)
+ 	(cd $(build_src) && zip ../$(package_name).zip -r .)
+ 	rm -rf $(build_src)

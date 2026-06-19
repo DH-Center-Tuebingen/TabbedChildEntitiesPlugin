@@ -4,7 +4,7 @@
     <name>TabbedChildEntities</name>
     <title>Tabbed Child Entities Plugin</title>
     <description>Plugin to display subentities of certain Entity Types as tab inside the Entitie's view.</description>
-    <version>1.0.0</version>
+    <version>0.9.0</version>
     <licence>MIT</licence>
     <authors>
         <author>Severin Opel</author>
