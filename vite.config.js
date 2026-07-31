@@ -18,6 +18,11 @@ if(!pluginName) {
 // Check if Vite is running in development mode
 const isDev = process.env.NODE_ENV === 'development';
 export default defineConfig({
+    resolve: {
+        alias: {
+            '@': '/src',
+        },
+    },
     plugins: [vue()],
     server: useViteDevServer(),
     define: {

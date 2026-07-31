@@ -56,6 +56,7 @@ class Hooks {
             $entityData['id'] = $child->id;
             $entityData['name'] = $child->name;
             $entityData['type'] = $child->entity_type_id;
+            $entityData['entity_type_name'] = $child->entity_type->name;
             $entityData['rank'] = $child->rank;
 
             $entityData['data'] = $child->getData();

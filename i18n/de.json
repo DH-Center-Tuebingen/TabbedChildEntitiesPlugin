@@ -1,0 +1,11 @@
+{
+    "tabbed_child_entities": {
+        "preference": {
+            "title": "Kind Tabs Titel Attribut",
+            "title_options": {
+                "entity_name": "Entitätsname",
+                "entity_type": "Entitäts Typ Bezeichnung"
+            }
+        }
+    }
+}

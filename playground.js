@@ -3,9 +3,24 @@ import TabbedChildEntity from './src/components/TabbedChildEntity.vue';
 import { defineComponent, h, ref } from 'vue';
 
 usePlayground({
+    stores: {
+        entityStore: {
+            getEntityTypeAttributes: () => {
+                return []
+            }
+        }
+    },
     http(verb, url, data, external = false, withHeaders = false) {
-
-        if (url.endsWith("/entity_detail")){
+        if (url.startsWith("file?filters")) {
+            return {
+                data: [
+                    { thumb_url: "https://picsum.photos/200/300", id: 1, name: "Image 1" },
+                    { thumb_url: "https://picsum.photos/200/300", id: 1, name: "Image 1" },
+                    { thumb_url: "https://picsum.photos/200/300", id: 1, name: "Image 1" },
+                ]
+            }
+        }
+        if (url.endsWith("/entity_detail")) {
 
             return {
                 "1": {
@@ -60,6 +75,11 @@ const WrappedTabbedChildEntity = defineComponent({
         return () =>
             h(TabbedChildEntity, {
                 id: '123',
+                value: {
+                    id: 10,
+                    type: "TestEntity",
+                    name: "Test Entity"
+                }
             });
     }
 });

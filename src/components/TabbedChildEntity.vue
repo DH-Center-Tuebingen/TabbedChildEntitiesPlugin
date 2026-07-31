@@ -1,11 +1,17 @@
 <template>
     <div class="tabbed-child-entity p-4">
-        <h3>{{ name }}</h3>
-
-        <div v-if="loading">
-            <span class="spin">...</span>
-        </div>
+        <span v-if="errors.length > 0" class="text-danger mb-3 d-block">
+            <div v-for="error in errors" :key="error">{{ error }}</div>
+        </span>
+        <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true">
+        </span>
         <template v-else>
+            <template v-if="hasFiles">
+                <h3>Linked Files</h3>
+                <FileList :files="files" v-if="files.length > 0" class="mb-3" />
+            </template>
+
+            <h3>Data</h3>
             <table class="table table-striped table-hover">
                 <thead class="text-secondary">
                     <tr>
@@ -28,27 +34,28 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import FileList from '@/components/FileList.vue';
+
+import useSharedLoading from '@/composables/shared-loading.js';
 
 const props = defineProps({
-    id: {
-        type: Number,
+    value: {
+        type: Object,
         required: true
     },
-    name: {
-        type: String,
-        required: false,
-    },
-    type: {
-        type: Number,
-        required: true,
-    }
 })
 
+const id = computed(() => props.value.id);
+const type = computed(() => props.value.type);
+const name = computed(() => props.value.name);
+
+const { loading, setLoading } = useSharedLoading(`tabbed-child-entity-${id.value}`);
+
 const entity = ref(null);
-const loading = ref(false);
+const files = ref([]);
 const attributes = ref([]);
-const error = ref(null);
+const errors = ref([]);
 
 const translateConcept = (conceptUrl) => SpPS.api.helpers.translateConcept(conceptUrl);
 const attributeTextValue = (attribute) => {
@@ -76,19 +83,44 @@ const attributeTextValue = (attribute) => {
     }
 };
 
-onMounted(async () => {
-    loading.value = true;
-
+const loadChildEntityData = async () => {
     try {
-        attributes.value = await SpPS.api.store.entityStore.getEntityTypeAttributes(props.type);
-        const response = await SpPS.api.http('get', `entity/${props.id}/entity_detail`)
+        attributes.value = await SpPS.api.store.entityStore.getEntityTypeAttributes(type.value);
+        const response = await SpPS.api.http('get', `entity/${id.value}/entity_detail`)
         entity.value = response.data;
-        loading.value = false;
     } catch (error) {
         console.error('Error fetching entity data:', error);
-        error.value = 'Failed to load entity data.';
+        errors.value.push('Failed to load entity data.');
     };
-    loading.value = false;
+};
+
+const loadChildEntityLinkedFiles = async () => {
+    let loadedFiles = [];
+    try {
+        const filters = { linked: id.value };
+        const response = await SpPS.api.http('get', `file?filters=${JSON.stringify(filters)}`);
+        console.log('Linked files response:', response);
+        loadedFiles = response.data;
+    } catch (error) {
+        console.error('Error fetching linked files:', error);
+        errors.value.push('Failed to load linked files.');
+    };
+    files.value = loadedFiles;
+    console.log('Linked files set to:', files.value);
+};
+
+async function loadData() {
+    setLoading(true);
+    errors.value = [];
+    await loadChildEntityData();
+    await loadChildEntityLinkedFiles();
+    setLoading(false);
+}
+
+onMounted(async () => {
+    await loadData();
 });
+
+const hasFiles = computed(() => files.value?.length && files.value.length > 0);
 
 </script>

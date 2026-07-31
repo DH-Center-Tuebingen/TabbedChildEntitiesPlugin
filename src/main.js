@@ -4,6 +4,7 @@ import { computed, reactive, ref, watch } from 'vue';
 import DataModelOptionsToggle from './components/DataModelOptionsToggle.vue';
 import TabbedChildTab from './components/TabbedChildTab.vue';
 import TabbedChildEntity from './components/TabbedChildEntity.vue';
+import SelectTitle from './components/SelectTitle.vue';
 
 // // Store (Vuex)
 // import store from './bootstrap/store.js';
@@ -12,19 +13,18 @@ import TabbedChildEntity from './components/TabbedChildEntity.vue';
 // import * as api from './bootstrap/api.js';
 
 // // i18n
-// import * as en from './i18n/en.json';
-// import * as de from './i18n/de.json';
-// import * as ja from './i18n/ja.json';
+import en from '../i18n/en.json';
+import de from '../i18n/de.json';
 
 const pluginName = 'tabbed_child_entities';
 
-const vBind = reactive({
-    value: true
-});
+// const vBind = reactive({
+//     value: true
+// });
 
-function setData(data) {
-    vBind.value = data.tabbed;
-}
+// function setData(data) {
+//     vBind.value = data.tabbed;
+// }
 
 function getData() {
     return {
@@ -36,9 +36,9 @@ const vOn = {
     update: (checked) => vBind.value = checked
 };
 
-watch(vBind, (value) => {
-    console.log('watch', value);
-});
+// watch(vBind, (value) => {
+//     console.log('watch', value);
+// });
 
 
 
@@ -46,20 +46,24 @@ SpPS.register({
     id: pluginName,
 });
 
-SpPS.intoSlot({
-    of: pluginName,
-    key: pluginName,
-    slot: 'dataModelOptions',
-    component: DataModelOptionsToggle,
-    componentTag: 'DataModelOptionsToggle',
-    vBind: vBind,
-    vOn: vOn,
-    methods: {
-        getData,
-        setData,
+SpPS.registerI18n(
+    pluginName,
+    {
+        en,
+        de,
     }
-});
+)
 
+SpPS.registerPreference({
+    of: pluginName,
+    key: "preference.title",
+    data: "v-model",
+    label: "plugin.tabbed_child_entities.preference.title",
+    category: "system",
+    subcategory: "interface",
+    component: SelectTitle,
+    default_value: 'entity_name'
+})
 
 const data = ref([]);
 
@@ -69,11 +73,11 @@ SpPS.registerDynalot({
     update: async ({ entity, response = null }) => {
         const nextData = [];
         if (response && response.tabbed_child_entities) {
-            for (const { id, name, type } of response.tabbed_child_entities) {
+            console.log('Received response with tabbed_child_entities:', response.tabbed_child_entities);
+            for (const childData of response.tabbed_child_entities) {
                 nextData.push({
-                    id,
-                    name,
-                    type,
+                    id: childData.id,
+                    value: childData
                 });
             }
         }
