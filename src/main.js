@@ -15,6 +15,7 @@ import SelectTitle from './components/SelectTitle.vue';
 // // i18n
 import en from '../i18n/en.json';
 import de from '../i18n/de.json';
+import TabbedChildPreference from './components/TabbedChildPreference.vue';
 
 const pluginName = 'tabbed_child_entities';
 
@@ -62,7 +63,18 @@ SpPS.registerPreference({
     category: "system",
     subcategory: "interface",
     component: SelectTitle,
-    default_value: 'entity_name'
+    default_value: 'entity_name',
+})
+
+SpPS.registerPreference({
+    of: pluginName,
+    key: "preference.entity_type",
+    data: "v-model",
+    label: "plugin.tabbed_child_entities.preference.entity_type",
+    category: "system",
+    subcategory: "interface",
+    component: TabbedChildPreference,
+    default_value: [],
 })
 
 const data = ref([]);

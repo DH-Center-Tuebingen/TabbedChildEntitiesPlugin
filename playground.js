@@ -14,9 +14,9 @@ usePlayground({
         if (url.startsWith("file?filters")) {
             return {
                 data: [
-                    { thumb_url: "https://picsum.photos/200/300", id: 1, name: "Image 1" },
-                    { thumb_url: "https://picsum.photos/200/300", id: 1, name: "Image 1" },
-                    { thumb_url: "https://picsum.photos/200/300", id: 1, name: "Image 1" },
+                    { category: "image",thumb_url: "https://picsum.photos/200/300", id: 1, name: "Tempor proident in non excepteur elit velit esse aliqua." },
+                    { category: "image",thumb_url: "https://picsum.photos/200/300", id: 1, name: "Image 1" },
+                    { category: "image",thumb_url: "https://picsum.photos/200/300", id: 1, name: "Image 1" },
                 ]
             }
         }

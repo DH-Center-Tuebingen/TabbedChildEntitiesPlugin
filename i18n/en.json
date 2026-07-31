@@ -5,7 +5,8 @@
             "title_options": {
                 "entity_name": "Entity Name",
                 "entity_type": "Entity Type Name"
-            }
+            },
+            "entity_type": "Tabbed Children Entity Types"
         }
     }
 }

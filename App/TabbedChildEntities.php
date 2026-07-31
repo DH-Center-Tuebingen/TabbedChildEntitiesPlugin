@@ -5,6 +5,8 @@ namespace App\Plugins\TabbedChildEntities\App;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Preference;
+
 class TabbedChildEntities extends Model
 {    
     protected $table = 'tabbed_child_entities'; // Specify the table name if it's different from the model name
@@ -24,7 +26,24 @@ class TabbedChildEntities extends Model
     // }
 
     public static function activeIds(array $ids) : array {
-        return TabbedChildEntities::whereIn('entity_type_id', $ids)->pluck('entity_type_id')->all();
+        $ids = [];
+        info("0");
+        $preferences = Preference::getPreferences();
+        info("1");
+        if(!$preferences || !is_array($preferences) || !isset($preferences['plugin.tabbed_child_entities.preference.entity_type']) ) {
+            return $ids;
+        }
+
+        info("2");
+        $entityTypePreference = $preferences['plugin.tabbed_child_entities.preference.entity_type'];
+
+        info("3");
+        info(json_encode($entityTypePreference));
+        if($entityTypePreference && isset($entityTypePreference->value) && isset($entityTypePreference->value->entity_types) && count($entityTypePreference->value->entity_types) > 0) {
+            $ids = $entityTypePreference->value->entity_types;
+            info("4");
+        }
+        return $ids;
     }
 
 

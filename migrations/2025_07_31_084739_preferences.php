@@ -16,6 +16,10 @@ return new class extends Migration {
                 'label' => 'plugin.tabbed_child_entities.preference.title',
                 'default_value' => '{"title": "entity_name"}',
             ],
+            [
+                'label' => 'plugin.tabbed_child_entities.preference.entity_type',
+                'default_value' => '{"entity_types": []}',
+            ],
         ]);
     }
 
@@ -23,6 +27,7 @@ return new class extends Migration {
      * Reverse the migrations.
      */
     public function rollback(): void {
-        DB::table('preferences')->where('label', 'plugin.tabbed_child_entities.preference.title');
+        DB::table('preferences')->where('label', 'plugin.tabbed_child_entities.preference.title')->delete();
+        DB::table('preferences')->where('label', 'plugin.tabbed_child_entities.preference.entity_type')->delete();
     }
 };

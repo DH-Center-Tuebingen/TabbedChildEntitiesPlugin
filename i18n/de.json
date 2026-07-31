@@ -5,7 +5,8 @@
             "title_options": {
                 "entity_name": "Entitätsname",
                 "entity_type": "Entitäts Typ Bezeichnung"
-            }
+            },
+            "entity_type": "Entitätstypen mit Kind Tabs"
         }
     }
 }
